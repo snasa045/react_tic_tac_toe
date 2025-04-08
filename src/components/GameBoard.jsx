@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import GameOver from "./GameOver";
+
 const initialBoardState = [
   [null, null, null],
   [null, null, null],
@@ -24,18 +26,19 @@ export default function GameBoard({
   currentPlayer,
   currentPlayerName,
   onUpdatePlayerDetails,
+  resetGameTurns,
 }) {
-  const [boardState, setBoardState] = useState(initialBoardState);
+  const [gameBoardState, setGameBoardState] = useState(initialBoardState);
   const [gameOver, setGameOver] = useState(false);
   const [winner, setWinner] = useState(null);
 
   const handleCellClick = (rowIndex, cellIndex) => {
-    if (gameOver || boardState[rowIndex][cellIndex]) return;
+    if (gameOver || gameBoardState[rowIndex][cellIndex]) return;
 
     // Update board
-    const newBoard = [...boardState.map((row) => [...row])];
+    const newBoard = [...gameBoardState.map((row) => [...row])];
     newBoard[rowIndex][cellIndex] = currentPlayer;
-    setBoardState(newBoard);
+    setGameBoardState(newBoard);
 
     // Check for win or draw
     const result = checkGameStatus(newBoard);
@@ -45,7 +48,7 @@ export default function GameBoard({
     } else if (result.isDraw) {
       setGameOver(true);
     } else {
-      onUpdatePlayerDetails(); // Switch player only if game continues
+      onUpdatePlayerDetails(rowIndex, cellIndex); // Switch player only if game continues
     }
   };
 
@@ -87,21 +90,17 @@ export default function GameBoard({
   };
 
   const resetGame = () => {
-    setBoardState(initialBoardState);
+    setGameBoardState(initialBoardState);
     setGameOver(false);
     setWinner(null);
+    resetGameTurns();
   };
 
   return (
     <>
-      {gameOver && (
-        <div>
-          {winner ? <p>Winner: {winner}</p> : <p>Draw!</p>}
-          <button onClick={resetGame}>Reset</button>
-        </div>
-      )}
+      {gameOver && <GameOver winner={winner} resetGame={resetGame} />}
       <ol id='game-board'>
-        {boardState.map((rowArray, rowIndex) => (
+        {gameBoardState.map((rowArray, rowIndex) => (
           <li key={rowIndex}>
             <ol>
               {rowArray.map((playerSymbol, cellIndex) => (
@@ -110,7 +109,6 @@ export default function GameBoard({
                     disabled={gameOver || playerSymbol}
                     onClick={() => {
                       handleCellClick(rowIndex, cellIndex);
-                      onUpdatePlayerDetails();
                     }}>
                     {playerSymbol}
                   </button>

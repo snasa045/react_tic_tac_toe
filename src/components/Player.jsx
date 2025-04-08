@@ -4,7 +4,7 @@ export default function Player({ player, index, onPlayerNameUpdate }) {
   const [updatedPlayerName, setUpdatedPlayerName] = useState(player.name);
 
   return (
-    <li>
+    <li className={player.isActive ? "active" : ""}>
       <span className='player'>
         {player.isEditing ? (
           <input
@@ -20,7 +20,7 @@ export default function Player({ player, index, onPlayerNameUpdate }) {
       </span>
 
       <button onClick={() => onPlayerNameUpdate(index, updatedPlayerName)}>
-        {!player.isEditing ? 'Edit' : 'Save'}
+        {!player.isEditing ? "Edit" : "Save"}
       </button>
     </li>
   );
